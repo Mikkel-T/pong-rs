@@ -280,7 +280,6 @@ fn move_ball(mut query: Query<(&mut Transform, &Velocity), With<Ball>>, game: Re
 }
 
 fn check_for_collisions(
-    // mut scoreboard: ResMut<Scoreboard>,
     mut ball_query: Query<(&mut Velocity, &Transform), With<Ball>>,
     collider_query: Query<(&Transform, Option<&WallL>, Option<&WallR>), With<Collider>>,
     mut game: ResMut<Game>,
