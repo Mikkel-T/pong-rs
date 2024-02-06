@@ -42,20 +42,18 @@ fn main() {
         })
         .add_event::<CollisionEvent>()
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
-        .add_startup_system(setup)
-        .add_systems(
+        .add_systems(Startup, setup)
+        .add_systems(FixedUpdate,
             (
                 check_for_collisions,
                 move_ball.before(check_for_collisions),
                 move_p1.before(check_for_collisions).after(move_ball),
                 move_p2.before(check_for_collisions).after(move_ball),
                 ball_collision.after(check_for_collisions),
-            )
-                .in_schedule(CoreSchedule::FixedUpdate),
+            ),
         )
-        .insert_resource(FixedTime::new_from_secs(TIME_STEP))
-        .add_system(update_scoreboard)
-        .add_system(bevy::window::close_on_esc)
+        .insert_resource(Time::<Fixed>::from_seconds(TIME_STEP.into()))
+        .add_systems(Update, (update_scoreboard, bevy::window::close_on_esc))
         .run();
 }
 
@@ -90,7 +88,7 @@ struct Game {
     paused: bool,
 }
 
-#[derive(Default)]
+#[derive(Default, Event)]
 struct CollisionEvent;
 
 fn setup(
@@ -340,7 +338,7 @@ fn ball_collision(
 ) {
     if !collision_events.is_empty() {
         collision_events.clear();
-        let (mut transform, velocity) = query.single_mut();
+        let (mut transform, _velocity) = query.single_mut();
         game.paused = true;
         transform.translation = BALL_STARTING_POSITION;
     }
